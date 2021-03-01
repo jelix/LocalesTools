@@ -1,0 +1,9 @@
+#!/usr/bin/env php
+<?php
+require(__DIR__.'/../vendor/autoload.php');
+
+$application = new \Symfony\Component\Console\Application('locales');
+$application->add(new \Jelix\LocaleTools\Command\ConvertPropertiesToPot());
+$application->add(new \Jelix\LocaleTools\Command\ConvertPropertiesToPo());
+$application->add(new \Jelix\LocaleTools\Command\ConvertPoToProperties());
+$application->run();
