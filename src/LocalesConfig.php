@@ -105,7 +105,7 @@ class LocalesConfig
 
 
         if (!isset($this->ini['module:'.$module])) {
-            throw new \Exception('unknown module');
+            throw new \Exception('unknown module '.$module);
         }
 
         $prop = $this->ini['module:'.$module];
@@ -169,11 +169,11 @@ class LocalesConfig
         } elseif ($translationPath == '@app-overloads') {
             $path =  $this->applicationPath.'app/overloads/:module/locales/:locale/';
         } elseif ($translationPath == '@app-locales') {
-            $path =  $this->applicationPath.'app/locales/:locale/:module/';
+            $path =  $this->applicationPath.'app/locales/:locale/:module/locales/';
         } elseif ($translationPath == '@var-overloads') {
             $path =  $this->applicationPath.'var/overloads/:module/locales/:locale/';
         } elseif ($translationPath == '@var-locales') {
-            $path =  $this->applicationPath.'var/locales/:locale/:module/';
+            $path =  $this->applicationPath.'var/locales/:locale/:module/locales/';
         } elseif (strpos($translationPath, '@app:') === 0) {
             $path = str_replace('@app:', $this->applicationPath, $translationPath);
         } else {
