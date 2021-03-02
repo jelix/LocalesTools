@@ -1,9 +1,13 @@
 {
   "name": "jelix/locales-tools",
   "type": "library",
-  "description": "",
+  "description": "Command line tools to manage or convert locales of a Jelix application.",
   "license": "MIT",
   "authors": [
+    {
+      "name": "Laurent Jouanneau",
+      "email": "laurent@jelix.org"
+    }
   ],
   "require": {
     "php": ">=7.2",
@@ -18,10 +22,5 @@
     }
   },
   "bin": ["bin/jelixlocales"],
-  "minimum-stability": "stable",
-  "config": {
-    "preferred-install": {
-      "*": "dist"
-    }
-  }
+  "minimum-stability": "stable"
 }
