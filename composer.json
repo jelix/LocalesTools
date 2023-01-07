@@ -11,10 +11,10 @@
   ],
   "require": {
     "php": ">=7.2",
-    "symfony/console":"5.2.*",
+    "symfony/console":"^5.4.0",
     "jelix/properties-file": "^1.2.1",
     "gettext/gettext": "^4.6.1",
-    "jelix/file-utilities": "^1.8.4"
+    "jelix/file-utilities": "^1.8.5"
   },
   "autoload" : {
     "psr-4": {
