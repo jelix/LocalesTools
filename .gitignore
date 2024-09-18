@@ -2,8 +2,7 @@ TAGS
 .DS_Store
 vendor/
 composer.lock
-tests/temp/*
-!tests/temp/.dummy
+tests/units/tmp
 .idea
 .php_cs.cache
 tests/.phpunit.result.cache

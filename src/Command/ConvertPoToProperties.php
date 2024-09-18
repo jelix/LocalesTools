@@ -10,6 +10,7 @@ namespace Jelix\LocaleTools\Command;
 use Gettext\Loader\PoLoader;
 use Jelix\FileUtilities\Directory;
 use Jelix\FileUtilities\Path;
+use Jelix\LocaleTools\PoToPropertiesConverter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -82,58 +83,19 @@ class ConvertPoToProperties extends AbstractCommand
             throw new \Exception($poFile.' is not readable !!');
         }
 
-        $loader = new PoLoader();
-        $translations = $loader->loadFile($poFile);
-
         if (!is_dir($localesPath)) {
             Directory::create($localesPath);
         }
 
-        $propertiesReader = new Parser();
-        $propertiesWriter = new Writer();
+        $converter = new PoToPropertiesConverter($poFile, $config->getPropertiesFileHeader());
 
         foreach ($files as $f) {
             $output->writeln($f);
-
-            $localeProperties = new \Jelix\PropertiesFile\Properties();
-            $USProperties = new \Jelix\PropertiesFile\Properties();
-            $propertiesReader->parseFromFile($originalLocalesPath.$f, $USProperties);
-
             $fileId = str_replace('.UTF-8.properties', '', $f);
             $msgctxtPrefix = $module.'~'.$fileId.'.';
 
-            $sameAsUs = true;
-            foreach ($USProperties->getIterator() as $key => $usString) {
-                $msgctxt = $msgctxtPrefix.$key;
-                $translation = $translations->find($msgctxt, $usString);
-                if ($translation === false) {
-                    $localeString = '';
-                } else {
-                    $localeString = $translation->getTranslation();
-                }
-                if (trim($localeString) == '') {
-                    $localeString = $usString;
-                }
-                if ($localeString != $usString) {
-                    $sameAsUs = false;
-                }
-                $localeProperties[$key] = $localeString;
-            }
-            if (!$sameAsUs) {
-                $propertiesWriter->writeToFile(
-                    $localeProperties,
-                    $localesPath.$f,
-                    array(
-                        'lineLength' => 500,
-                        'spaceAroundEqual' => false,
-                        'removeTrailingSpace' => true,
-                        'cutOnlyAtSpace' => true,
-                        'headerComment' => $config->getPropertiesFileHeader(),
-                    )
-                );
-            } elseif (file_exists($localesPath.$f)) {
-                unlink($localesPath.$f);
-            }
+            $converter->convertToProperties($originalLocalesPath.$f,
+                $localesPath.$f, $msgctxtPrefix);
         }
         return 0;
     }

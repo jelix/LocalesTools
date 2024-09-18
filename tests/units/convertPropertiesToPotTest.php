@@ -1,9 +1,6 @@
 <?php
 
-use Jelix\LocaleTools\Command\ConvertPropertiesToPo;
-use Jelix\LocaleTools\PropertiesToPoConverter;
 use Jelix\LocaleTools\PropertiesToPotConverter;
-use Symfony\Component\Console\Tester\CommandTester;
 
 class convertPropertiesToPotTest extends \PHPUnit\Framework\TestCase
 {
