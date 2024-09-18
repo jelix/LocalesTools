@@ -7,17 +7,13 @@
  */
 namespace Jelix\LocaleTools\Command;
 
-use Gettext\Generator\PoGenerator;
-use Gettext\Translation;
 use Jelix\FileUtilities\Directory;
 use Jelix\FileUtilities\Path;
+use Jelix\LocaleTools\PropertiesToPotConverter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Gettext\Translations;
-use Jelix\PropertiesFile\Parser;
 
 class ConvertPropertiesToPot extends AbstractCommand
 {
@@ -64,39 +60,16 @@ class ConvertPropertiesToPot extends AbstractCommand
         $output->writeln($modulePath);
         $output->writeln($originalLocalesPath);
 
-        $dt = new \DateTime('NOW');
         $projectId = $config->getProjectId(). ' ' . $module;
 
-        $translations = Translations::create();
-        $translations->getHeaders()
-            ->set('Project-Id-Version', $projectId)
-            ->set('Report-Msgid-Bugs-To', '')
-            ->set('POT-Creation-Date', $dt->format('Y-m-d H:i+O'))
-            ->set('PO-Revision-Date', $dt->format('Y-m-d H:i+O'))
-            ->set('Last-Translator', 'FULL NAME <EMAIL@ADDRESS>')
-            ->set('MIME-Version', '1.0')
-            ->set('Content-Type', 'text/plain; charset=UTF-8')
-            ->set('Content-Transfer-Encoding', '8bit');
+        $dt = new \DateTime('NOW');
+        $converter = new PropertiesToPotConverter($projectId, $dt->format('Y-m-d H:i+O'));
 
-        $propertiesReader = new Parser();
         foreach ($files as $f) {
             $output->writeln($f);
             $fileId = str_replace('.UTF-8.properties', '', $f);
-            $properties = new \Jelix\PropertiesFile\Properties();
-            $propertiesReader->parseFromFile($originalLocalesPath.$f, $properties);
             $msgctxtPrefix = $module.'~'.$fileId.'.';
-            $propertiesArray = array();
-            foreach ($properties->getIterator() as $key => $value) {
-                $propertiesArray[$key] = $value;
-            }
-            ksort($propertiesArray);
-            foreach ($propertiesArray as $key => $value) {
-                $msgctxt = $msgctxtPrefix.$key;
-                $translation = Translation::create($msgctxt, $value);
-                $translation->getReferences()->add($msgctxt);
-                $translation->translate('');
-                $translations->add($translation);
-            }
+            $converter->importFile($originalLocalesPath.$f, $msgctxtPrefix);
         }
 
         $potPath = $input->getArgument('pot-path');
@@ -104,8 +77,7 @@ class ConvertPropertiesToPot extends AbstractCommand
         Directory::create($potPath);
         $poFile = $potPath.$module.'.pot';
         $output->writeln("save to: ${poFile}");
-        $poGen = new PoGenerator();
-        $poGen->generateFile($translations, $poFile);
+        $converter->savePoFile($poFile);
 
         $output->writeln("================");
         return 0;

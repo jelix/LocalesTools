@@ -1,0 +1,35 @@
+msgid ""
+msgstr ""
+"Content-Transfer-Encoding: 8bit\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"MIME-Version: 1.0\n"
+"PO-Revision-Date: 2024-09-18 10:19++0000\n"
+"POT-Creation-Date: 2024-09-18 10:19++0000\n"
+"Project-Id-Version: MyProject\n"
+"Report-Msgid-Bugs-To: \n"
+
+#: mymodule~framework.name
+msgctxt "mymodule~framework.name"
+msgid "Jelix"
+msgstr ""
+
+#: mymodule~framework.slogan
+msgctxt "mymodule~framework.slogan"
+msgid "Jelix, a framework for PHP"
+msgstr ""
+
+#: mymodule~newapp.h1
+msgctxt "mymodule~newapp.h1"
+msgid "Welcome in your new jelix application"
+msgstr ""
+
+#: mymodule~original
+msgctxt "mymodule~original"
+msgid "Inexistant into test1"
+msgstr ""
+
+#: mymodule~welcome
+msgctxt "mymodule~welcome"
+msgid "Welcome"
+msgstr ""
