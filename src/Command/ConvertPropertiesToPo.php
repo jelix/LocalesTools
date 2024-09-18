@@ -7,17 +7,13 @@
  */
 namespace Jelix\LocaleTools\Command;
 
-use Gettext\Generator\PoGenerator;
-use Gettext\Translation;
 use Jelix\FileUtilities\Directory;
 use Jelix\FileUtilities\Path;
+use Jelix\LocaleTools\PropertiesToPoConverter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Gettext\Translations;
-use Jelix\PropertiesFile\Parser;
 
 class ConvertPropertiesToPo extends AbstractCommand
 {
@@ -78,64 +74,21 @@ class ConvertPropertiesToPo extends AbstractCommand
         //$output->writeln($originalLocalesPath);
         //$output->writeln($enLocalesPath);
 
-        $dt = new \DateTime('NOW');
         $projectId = $config->getProjectId(). ' ' . $module;
 
-
-        $translations = Translations::create(null, $locale);
-        $translations->getHeaders()
-            ->set('Project-Id-Version', $projectId)
-            ->set('Report-Msgid-Bugs-To', '')
-            ->set('POT-Creation-Date', $dt->format('Y-m-d H:i+O'))
-            ->set('PO-Revision-Date', $dt->format('Y-m-d H:i+O'))
-            ->set('Last-Translator', 'FULL NAME <EMAIL@ADDRESS>')
-            ->set('Language-Team', $locale)
-            ->set('MIME-Version', '1.0')
-            ->set('Content-Type', 'text/plain; charset=UTF-8')
-            ->set('Content-Transfer-Encoding', '8bit');
-
-        $propertiesReader = new Parser();
+        $dt = new \DateTime('NOW');
+        $converter = new PropertiesToPoConverter($projectId, $locale, $dt->format('Y-m-d H:i+O'));
 
         foreach ($files as $f) {
             $output->writeln($f);
 
-            // read locale file
-            $localeProperties = new \Jelix\PropertiesFile\Properties();
-            if (file_exists($localesPath.$f)) {
-                $propertiesReader->parseFromFile($localesPath.$f, $localeProperties);
-            }
-
-            // if the locale file is not the original one in the module,
-            // let's read the original one
-            $originalProperties = new \Jelix\PropertiesFile\Properties();
-            if ($originalLocalesPath !== $localesPath && file_exists($originalLocalesPath.$f)) {
-                $propertiesReader->parseFromFile($originalLocalesPath.$f, $originalProperties);
-            }
-
-            // read the en_US properties file.
-            $USProperties = new \Jelix\PropertiesFile\Properties();
-            $propertiesReader->parseFromFile($enLocalesPath.$f, $USProperties);
-
             $fileId = str_replace('.UTF-8.properties', '', $f);
             $msgctxtPrefix = $module.'~'.$fileId.'.';
 
-            foreach ($USProperties->getIterator() as $key => $value) {
-                $msgctxt = $msgctxtPrefix.$key;
-
-                $translation = Translation::create($msgctxt, $value);
-                $translation->getReferences()->add($msgctxt);
-
-                $localeValue = $localeProperties[$key];
-                if ($localeValue === null) {
-                    $localeValue = $originalProperties[$key];
-                }
-                if ($localeValue !== null && $localeValue != $value) {
-                    $translation->translate($localeValue);
-                } else {
-                    $translation->translate('');
-                }
-                $translations->add($translation);
-            }
+            $converter->importFile($localesPath.$f,
+                $enLocalesPath.$f,
+                $msgctxtPrefix,
+                $originalLocalesPath.$f);
         }
 
         $poPath = $input->getArgument('po-root-path');
@@ -144,8 +97,7 @@ class ConvertPropertiesToPo extends AbstractCommand
         $poFile = $poPath.$module.'.po';
 
         $output->writeln("save to: ${poFile}");
-        $poGen = new PoGenerator();
-        $poGen->generateFile($translations, $poFile);
+        $converter->savePoFile($poFile);
 
         return 0;
     }

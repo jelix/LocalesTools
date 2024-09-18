@@ -16,6 +16,9 @@
     "gettext/gettext": "^5.7.1",
     "jelix/file-utilities": "^1.8.5"
   },
+  "require-dev": {
+    "phpunit/phpunit": "9.6.*"
+  },
   "autoload" : {
     "psr-4": {
       "Jelix\\LocaleTools\\" : "src/"
