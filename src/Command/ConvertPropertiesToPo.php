@@ -1,24 +1,23 @@
 <?php
 /**
  * @author     Laurent Jouanneau
- * @copyright  2021 Laurent Jouanneau
- * @link       http://jelix.org
+ * @copyright  2021-2024 Laurent Jouanneau
+ * @link       https://jelix.org
  * @licence    MIT
  */
 namespace Jelix\LocaleTools\Command;
 
+use Gettext\Generator\PoGenerator;
+use Gettext\Translation;
 use Jelix\FileUtilities\Directory;
 use Jelix\FileUtilities\Path;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command;
 
 use Gettext\Translations;
 use Jelix\PropertiesFile\Parser;
-use Jelix\PropertiesFile\Properties;
-use Jelix\PropertiesFile\Writer;
 
 class ConvertPropertiesToPo extends AbstractCommand
 {
@@ -82,18 +81,18 @@ class ConvertPropertiesToPo extends AbstractCommand
         $dt = new \DateTime('NOW');
         $projectId = $config->getProjectId(). ' ' . $module;
 
-        $translations = new Translations();
-        $translations->setHeader('Project-Id-Version', $projectId);
-        $translations->setHeader('Report-Msgid-Bugs-To', '');
-        $translations->setHeader('POT-Creation-Date', $dt->format('Y-m-d H:i+O'));
-        $translations->setHeader('PO-Revision-Date', $dt->format('Y-m-d H:i+O'));
-        $translations->setHeader('Last-Translator', 'FULL NAME <EMAIL@ADDRESS>');
-        $translations->setHeader('Language-Team', $locale);
-        $translations->setHeader('MIME-Version', '1.0');
-        $translations->setHeader('Content-Type', 'text/plain; charset=UTF-8');
-        $translations->setHeader('Content-Transfer-Encoding', '8bit');
-        $translations->setHeader('Language', $locale);
-        Translations::$options['headersSorting'] = false;
+
+        $translations = Translations::create(null, $locale);
+        $translations->getHeaders()
+            ->set('Project-Id-Version', $projectId)
+            ->set('Report-Msgid-Bugs-To', '')
+            ->set('POT-Creation-Date', $dt->format('Y-m-d H:i+O'))
+            ->set('PO-Revision-Date', $dt->format('Y-m-d H:i+O'))
+            ->set('Last-Translator', 'FULL NAME <EMAIL@ADDRESS>')
+            ->set('Language-Team', $locale)
+            ->set('MIME-Version', '1.0')
+            ->set('Content-Type', 'text/plain; charset=UTF-8')
+            ->set('Content-Transfer-Encoding', '8bit');
 
         $propertiesReader = new Parser();
 
@@ -122,17 +121,20 @@ class ConvertPropertiesToPo extends AbstractCommand
 
             foreach ($USProperties->getIterator() as $key => $value) {
                 $msgctxt = $msgctxtPrefix.$key;
-                $translation = $translations->insert($msgctxt, $value);
-                $translation->addReference($msgctxt);
+
+                $translation = Translation::create($msgctxt, $value);
+                $translation->getReferences()->add($msgctxt);
+
                 $localeValue = $localeProperties[$key];
                 if ($localeValue === null) {
                     $localeValue = $originalProperties[$key];
                 }
                 if ($localeValue !== null && $localeValue != $value) {
-                    $translation->setTranslation($localeValue);
+                    $translation->translate($localeValue);
                 } else {
-                    $translation->setTranslation('');
+                    $translation->translate('');
                 }
+                $translations->add($translation);
             }
         }
 
@@ -142,7 +144,9 @@ class ConvertPropertiesToPo extends AbstractCommand
         $poFile = $poPath.$module.'.po';
 
         $output->writeln("save to: ${poFile}");
-        \Gettext\Generators\Po::toFile($translations, $poFile);
+        $poGen = new PoGenerator();
+        $poGen->generateFile($translations, $poFile);
+
         return 0;
     }
 }

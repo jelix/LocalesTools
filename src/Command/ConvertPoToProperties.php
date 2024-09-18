@@ -1,23 +1,22 @@
 <?php
 /**
  * @author     Laurent Jouanneau
- * @copyright  2021 Laurent Jouanneau
- * @link       http://jelix.org
+ * @copyright  2021-2024 Laurent Jouanneau
+ * @link       https://jelix.org
  * @licence    MIT
  */
 namespace Jelix\LocaleTools\Command;
 
+use Gettext\Loader\PoLoader;
 use Jelix\FileUtilities\Directory;
 use Jelix\FileUtilities\Path;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Command\Command;
 
 use Gettext\Translations;
 use Jelix\PropertiesFile\Parser;
-use Jelix\PropertiesFile\Properties;
 use Jelix\PropertiesFile\Writer;
 
 class ConvertPoToProperties extends AbstractCommand
@@ -83,8 +82,8 @@ class ConvertPoToProperties extends AbstractCommand
             throw new \Exception($poFile.' is not readable !!');
         }
 
-        $translations = new Translations();
-        \Gettext\Extractors\Po::fromFile($poFile, $translations);
+        $loader = new PoLoader();
+        $translations = $loader->loadFile($poFile);
 
         if (!is_dir($localesPath)) {
             Directory::create($localesPath);
