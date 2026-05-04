@@ -25,7 +25,7 @@ Here is its content:
 applicationPath=.
 
 ; a project id : can be a name with the version of your project
-projectId=jelix 1.6.33
+projectId=jelix 1.8.22
 
 ; header to add into each generated properties files
 propertiesFileHeader="Please don't modify this file."
@@ -75,4 +75,3 @@ You can use some specific keywords that will be replace by the real path:
 # commands
 
 Run `vendor/bin/jelixlocales` to have helo and the list of possible commands.
-
