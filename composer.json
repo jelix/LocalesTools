@@ -10,11 +10,11 @@
     }
   ],
   "require": {
-    "php": ">=7.2",
+    "php": ">=7.4",
     "symfony/console":"^5.4.0",
-    "jelix/properties-file": "^1.2.1",
-    "gettext/gettext": "^5.7.1",
-    "jelix/file-utilities": "^1.8.5"
+    "jelix/properties-file": "^1.2.3",
+    "gettext/gettext": "^5.7.3",
+    "jelix/file-utilities": "^1.8.6"
   },
   "require-dev": {
     "phpunit/phpunit": "9.6.*"
