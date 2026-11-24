@@ -53,7 +53,7 @@ class PoToPropertiesConverter
             } else {
                 $localeString = $translation->getTranslation();
             }
-            if (trim($localeString) == '') {
+            if ($localeString === null || trim($localeString) == '') {
                 $localeString = $usString;
             }
             if ($localeString != $usString) {
