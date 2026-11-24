@@ -48,7 +48,7 @@ class PoToPropertiesConverter
         foreach ($USProperties->getIterator() as $key => $usString) {
             $msgctxt = $contextPrefix.$key;
             $translation = $this->translations->find($msgctxt, $usString);
-            if ($translation === false) {
+            if ($translation === false || $translation === null) {
                 $localeString = '';
             } else {
                 $localeString = $translation->getTranslation();
